@@ -114,7 +114,7 @@
 if !$lctseng_scripts  
   $lctseng_scripts = {}
 end
-$lctseng_scripts[:text_reader] = "1.00"
+$lctseng_scripts[:text_reader] = "1.10"
 
 puts "載入腳本：Lctseng - 對話文本讀取，版本：#{$lctseng_scripts[:text_reader]}"
 
