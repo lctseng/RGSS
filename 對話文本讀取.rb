@@ -7,7 +7,7 @@
 
                        for RGSS3
 
-        Ver 1.00   2014.07.14
+        Ver 1.10   2014.07.15
 
    原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
    原為替"wer227942914(小羽貓咪)"撰寫的特製版本
@@ -34,7 +34,13 @@
     摘要：一、最初版本
 
 
-                       
+   更新紀錄：
+    Ver 1.10 ：
+    日期：2014.07.15
+    摘要：一、追加手動換行功能，提示字元為\k
+
+
+                        
                        
 
     撰寫摘要：一、此腳本修改或重新定義以下類別：
@@ -232,6 +238,15 @@ end
 
 class Window_Message < Window_Base
   #--------------------------------------------------------------------------
+  # ● 跳脫字元處理
+  #--------------------------------------------------------------------------
+
+  def convert_escape_characters(text)
+    result = super
+    result.gsub!(/\ek/)          { "\k" }
+    result
+  end
+  #--------------------------------------------------------------------------
   # ● 文字的處理，加入換行操作
   #     c    : 文字
   #     text : 繪制處理中的字符串緩存（字符串可能會被修改）
@@ -241,12 +256,14 @@ class Window_Message < Window_Base
     case c
     when "\r"   # 回車
       super
-    when "\n"   # 換行
+    when "\n"   # 換行(失效)
       super
     when "\f"   # 翻頁
       super
     when "\e"   # 控制符
       super
+    when "\k"   # 要求換行
+      process_new_line(text, pos)
     else        # 普通文字
       process_normal_character(c, text , pos)
     end
