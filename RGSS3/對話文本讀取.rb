@@ -7,7 +7,7 @@
 
                        for RGSS3
 
-        Ver 1.10   2014.07.15
+        Ver 1.20   2014.08.15
 
    原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
    原為替"wer227942914(小羽貓咪)"撰寫的特製版本
@@ -18,7 +18,7 @@
    個人小屋連結：http://home.gamer.com.tw/homeindex.php?owner=play123
 
    主要功能：
-                       一、讀取文本文字到對話框
+                       一、讀取文本文字到對話框(文本須放在腳本欄中)
                        二、原本文章顯示的控制符號皆可使用
                        三、自動換行功能
                        四、指令執行功能，可操作變數、開關，顯示圖片、音樂效果
@@ -39,6 +39,10 @@
     日期：2014.07.15
     摘要：一、追加手動換行功能，提示字元為\k
 
+   更新紀錄：
+    Ver 1.20 ：
+    日期：2014.08.15
+    摘要：一、文本位置由檔案改為放到腳本欄中
 
                         
                        
@@ -134,18 +138,10 @@ module TextReader
   # ● 迭代每一行，無處理
   #--------------------------------------------------------------------------
   def self.iterate_each_line(filename)
-    File.open("Data/Script/#{filename}.txt","r") do |file|
-      head = false
-      file.each_line do |line|
-        if !head
-          puts "忽略：#{line}"
-          head = true
-          next
-        else
-          yield line
-        end
-        
-      end
+    string = ""
+    eval("string = #{filename}")
+    string.each_line do |line|
+      yield line.clone
     end
   end
   #--------------------------------------------------------------------------
