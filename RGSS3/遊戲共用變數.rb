@@ -7,7 +7,7 @@
 
                        for RGSS3
 
-        Ver 1.00   2014.06.30
+        Ver 1.10   2014.08.15
 
    原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
    
@@ -27,7 +27,11 @@
                 ■、功能：                  
                        一、設定某些範圍的開關和變量將永遠在遊戲間共用
 
-
+    Ver 1.10 ：
+    日期：2014.08.15
+    摘要：■、錯誤修正：                  
+                       一、打包後的遊戲專案使用會有找不到檔案的問題      
+                       
 
     撰寫摘要：一、此腳本修改或重新定義以下類別：
                            ■ Game_Switches
@@ -79,7 +83,7 @@ if !$lctseng_scripts
 end
 
 
-$lctseng_scripts[:permanently_variable] = "1.00"
+$lctseng_scripts[:permanently_variable] = "1.10"
 
 puts "載入腳本：Lctseng - 遊戲共用變數，版本：#{$lctseng_scripts[:permanently_variable]}"
 
@@ -138,7 +142,7 @@ module PermanentlyVariables
   def self.load_record
     data = nil
     begin
-      data = load_data("Data/Permanent.rvdata2")
+      data = load_data("Permanent.dat")
       puts "已讀取存在的檔案"
     rescue
       puts "檔案不存在！創立新物件"
@@ -151,7 +155,7 @@ module PermanentlyVariables
   #--------------------------------------------------------------------------
   def self.sync_record
     puts "正在同步檔案"
-    save_data($game_permanent, "Data/Permanent.rvdata2")
+    save_data($game_permanent, "Permanent.dat")
   end
 
 end
