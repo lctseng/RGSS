@@ -48,6 +48,13 @@ if !$lctseng_scripts
 end
 
 
+## 檢查衝突腳本
+if $lctseng_scripts[:large_choice_window]
+  msgbox("發現衝突腳本：Lctseng - 選項視窗美化！請將此腳本置於該腳本上方！\n程式即將關閉")
+  exit
+end
+
+
 $lctseng_scripts[:merge_choice] = "1.00"
 
 puts "載入腳本：Lctseng - 合併選項欄位，版本：#{$lctseng_scripts[:merge_choice]}"
