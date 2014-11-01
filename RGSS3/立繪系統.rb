@@ -3,11 +3,11 @@
 =begin
 *******************************************************************************************
 
-   ＊ 遊戲共用變數 ＊
+   ＊ 立繪系統 ＊
 
                        for RGSS3
 
-        Ver 1.00   2014.09.24
+        Ver 1.10   2014.10.30
 
    原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
    
@@ -27,7 +27,13 @@
     Ver 1.00 ：
     日期：2014.09.24
     摘要：■、最初版本
-
+    
+    
+    Ver 1.10 ：
+    日期：2014.10.30
+    摘要：■、加入調整透明度的功能
+    
+    
     撰寫摘要：一、此腳本修改或重新定義以下類別：
                            ■ Game_Interpreter
                            ■ Game_System
@@ -159,6 +165,18 @@ class Game_Interpreter
   def right_behind
     right_z(50)
   end
+  #--------------------------------------------------------------------------
+  # ● 左圖片最大透明限制
+  #--------------------------------------------------------------------------
+  def left_limit_opacity(*args)
+    $game_system.stand.left_limit_opacity(*args)
+  end
+  #--------------------------------------------------------------------------
+  # ● 右圖片最大透明限制
+  #--------------------------------------------------------------------------
+  def right_limit_opacity(*args)
+    $game_system.stand.right_limit_opacity(*args)
+  end
 
 end
   
@@ -257,6 +275,12 @@ class Game_StandController
     @left.slide_out_req
   end
   #--------------------------------------------------------------------------
+  # ● 左圖片最大透明限制
+  #--------------------------------------------------------------------------
+  def left_limit_opacity(value)
+    @left.limit_opacity(value)
+  end
+  #--------------------------------------------------------------------------
   # ● 右圖片飛入
   #--------------------------------------------------------------------------
   def right_slide_in(filename)
@@ -268,6 +292,12 @@ class Game_StandController
   #--------------------------------------------------------------------------
   def right_slide_out
     @right.slide_out_req
+  end
+  #--------------------------------------------------------------------------
+  # ● 右圖片最大透明限制
+  #--------------------------------------------------------------------------
+  def right_limit_opacity(value)
+    @right.limit_opacity(value)
   end
   #--------------------------------------------------------------------------
   # ● 左圖片更換
@@ -301,6 +331,7 @@ class Game_Stand
   attr_reader :new_filename
   attr_reader :old_filename
   attr_reader :change_fast
+  attr_reader :opacity_limit
   attr_accessor :z
   #--------------------------------------------------------------------------
   # ● 初始化對象
@@ -326,7 +357,10 @@ class Game_Stand
     @change_fast = false
     #  Z 座標
     @z = 300
+    # 透明度最大限制
+    @opacity_limit = 255
   end
+
   #--------------------------------------------------------------------------
   # ● 回應飛入要求
   #--------------------------------------------------------------------------
@@ -389,6 +423,12 @@ class Game_Stand
   #--------------------------------------------------------------------------
   def slide_out_req
     @status = :slide_out_req if @status != :none
+  end
+  #--------------------------------------------------------------------------
+  # ● 限制透明度
+  #--------------------------------------------------------------------------
+  def limit_opacity(value)
+    @opacity_limit = value
   end
   
 end
@@ -546,8 +586,12 @@ class Sprite_Stand < Sprite_Base
   # ● 初始化對象
   #--------------------------------------------------------------------------
   def initialize(viewport)
+    @opacity_limit = 255
+    @origin_opacity = 255
     super(viewport)
+    @origin_opacity = self.opacity
     @filename = ''
+    check_opacity
     fader_init
     slider_init
     @shadow = Sprite_StandShadow.new(self,viewport)
@@ -562,11 +606,31 @@ class Sprite_Stand < Sprite_Base
   #--------------------------------------------------------------------------
   def update
     super
+    check_opacity
     check_action
     fader_update
     slider_update
     self.z = control.z
     @shadow.update
+  end
+  #--------------------------------------------------------------------------
+  # ● 設定透明度
+  #--------------------------------------------------------------------------
+  alias :set_opacity :opacity=
+  #--------------------------------------------------------------------------
+  def opacity=(val)
+    @origin_opacity = val
+    adj = [@origin_opacity,@opacity_limit].min
+    set_opacity(adj)
+  end
+  #--------------------------------------------------------------------------
+  # ● 檢查透明度
+  #--------------------------------------------------------------------------
+  def check_opacity
+    if  @opacity_limit != control.opacity_limit
+      @opacity_limit = control.opacity_limit
+      self.opacity = @origin_opacity
+    end
   end
   #--------------------------------------------------------------------------
   # ● 檢查動作
