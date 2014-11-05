@@ -7,7 +7,7 @@
 
                        for RGSS3
 
-        Ver 1.10   2014.10.30
+        Ver 1.11   2014.11.05
 
    原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
    
@@ -33,6 +33,10 @@
     日期：2014.10.30
     摘要：■、加入調整透明度的功能
     
+    
+    Ver 1.11 ：
+    日期：2014.11.05
+    摘要：■、修正立即出現沒有調整透明度的錯誤
     
     撰寫摘要：一、此腳本修改或重新定義以下類別：
                            ■ Game_Interpreter
@@ -77,7 +81,7 @@ if !$lctseng_scripts[:sprite_ex]
 end
 
 
-$lctseng_scripts[:stand_picture] = "1.00"
+$lctseng_scripts[:stand_picture] = "1.11"
 
 puts "載入腳本：Lctseng - 立繪系統，版本：#{$lctseng_scripts[:stand_picture]}"
 
@@ -353,7 +357,7 @@ class Game_Stand
     @new_filename = '' 
     # 更換時的舊檔名【僅show中更換時生效】
     @old_filename = ''
-    # 更換時是否快速更換【僅show中更換時生效】
+    # 更換時是否快速更換，代表立即顯示不淡入
     @change_fast = false
     #  Z 座標
     @z = 300
@@ -733,6 +737,8 @@ class Sprite_Stand < Sprite_Base
     self.bitmap = Cache.picture(@filename)
     # 重新對齊座標
     set_pos(slide_in_pos_adjust(slided_in_pos))
+    # 設定透明度
+    self.opacity = 255
   end
   #--------------------------------------------------------------------------
   # ● 設置陰影
