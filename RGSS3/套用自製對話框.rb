@@ -7,7 +7,7 @@
 
                        for RGSS3
 
-        Ver 1.00   2014.10.19
+        Ver 1.01   2015.01.21
 
    原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
    
@@ -42,6 +42,11 @@
     日期：2014.10.19
     摘要：
           ■、腳本整合發布
+          
+    Ver 1.01
+    日期：2015.01.21
+    摘要：
+          ■、修正與\LF立繪腳本衝突的問題
           
           
     撰寫摘要：一、此腳本修改或重新定義以下類別：
@@ -110,16 +115,16 @@ class Window_Message < Window_Base
   # ● 方法重新定義別名
   #--------------------------------------------------------------------------
   unless $@
-    alias lctseng_for_message_name_block_Update_all_windows update_all_windows # 更新所有窗口
-    alias lctseng_for_message_name_block_Initialize initialize # 初始化對象
-    alias lctseng_for_message_name_block_Dispose dispose # 釋放
-    alias lctseng_for_message_name_block_Update_placement update_placement # 更新窗口的位置
+    alias lctseng_for_custom_talk_frame_Update_all_windows update_all_windows # 更新所有窗口
+    alias lctseng_for_custom_talk_frame_Initialize initialize # 初始化對象
+    alias lctseng_for_custom_talk_frame_Dispose dispose # 釋放
+    alias lctseng_for_custom_talk_frame_Update_placement update_placement # 更新窗口的位置
   end
   #--------------------------------------------------------------------------
   # ● 初始化對象 - 重新定義
   #--------------------------------------------------------------------------
   def initialize(*args,&block)
-    lctseng_for_message_name_block_Initialize(*args,&block)
+    lctseng_for_custom_talk_frame_Initialize(*args,&block)
     self.opacity = 0
     create_talk_frame_sprite
   end
@@ -139,7 +144,7 @@ class Window_Message < Window_Base
   #--------------------------------------------------------------------------
   def dispose(*args,&block)
     dispose_talk_frame_sprite
-    lctseng_for_message_name_block_Dispose(*args,&block)
+    lctseng_for_custom_talk_frame_Dispose(*args,&block)
   end
   #--------------------------------------------------------------------------
   # ● 釋放對話視窗精靈
@@ -151,7 +156,7 @@ class Window_Message < Window_Base
   # ● 更新所有窗口 - 重新定義
   #--------------------------------------------------------------------------
   def update_all_windows
-    lctseng_for_message_name_block_Update_all_windows
+    lctseng_for_custom_talk_frame_Update_all_windows
     if self.visible
       @blank_frame_sprite.opacity = self.openness
     else
@@ -194,7 +199,7 @@ class Window_Message < Window_Base
   # ● 更新窗口的位置 - 重新定義
   #--------------------------------------------------------------------------
   def update_placement
-    lctseng_for_message_name_block_Update_placement
+    lctseng_for_custom_talk_frame_Update_placement
     update_background_sprite_placement
   end
 end
