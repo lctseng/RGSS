@@ -7,10 +7,10 @@
 
                        for RGSS3
 
-        Ver 1.10   2014.08.15
+        Ver 1.2.0   2015.07.30
 
    原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
-   
+
 
    轉載請保留此標籤
 
@@ -18,29 +18,33 @@
 
    主要功能：
                        一、設定某些範圍的開關和變量將永遠在遊戲間共用
-                       
+
 
    更新紀錄：
-    Ver 1.00 ：
+    Ver 1.0.0 ：
     日期：2014.06.30
     摘要：■、最初版本
-                ■、功能：                  
+                ■、功能：
                        一、設定某些範圍的開關和變量將永遠在遊戲間共用
 
-    Ver 1.10 ：
+    Ver 1.1.0 ：
     日期：2014.08.15
-    摘要：■、錯誤修正：                  
-                       一、打包後的遊戲專案使用會有找不到檔案的問題      
-                       
+    摘要：■、錯誤修正：
+                       一、打包後的遊戲專案使用會有找不到檔案的問題
+
+
+    Ver 1.2.0 ：
+    日期：2015.07.30
+    摘要：■、新增安全機制
 
     撰寫摘要：一、此腳本修改或重新定義以下類別：
                            ■ Game_Switches
                            ■ Game_Variables
-                          
+
                         二、此腳本新定義以下類別和模組：
                            ■ Lctseng::PermanentlyVariables
                            ■ Game_PermanentlyVariables
-                          
+
 
 *******************************************************************************************
 
@@ -62,6 +66,11 @@ module PermanentlyVariables
   SWITCH_RANGE = Range.new(10,20)
   # 變量：20~30
   VARIABLE_RANGE = Range.new(20,30)
+  #--------------------------------------------------------------------------
+  # ● 安全設定：設定兩個很大的質數，以避免永久存檔遭到修改
+  #--------------------------------------------------------------------------
+  PRIME_1 = 179424779
+  PRIME_2 = 179428399
 
 end
 end
@@ -71,19 +80,19 @@ end
 #*******************************************************************************************
 #
 #   請勿修改從這裡以下的程式碼，除非你知道你在做什麼！
-#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO ! 
+#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO !
 #
 #*******************************************************************************************
 
 #--------------------------------------------------------------------------
 # ★ 紀錄腳本資訊
 #--------------------------------------------------------------------------
-if !$lctseng_scripts  
+if !$lctseng_scripts
   $lctseng_scripts = {}
 end
 
 
-$lctseng_scripts[:permanently_variable] = "1.10"
+$lctseng_scripts[:permanently_variable] = "1.2.0"
 
 puts "載入腳本：Lctseng - 遊戲共用變數，版本：#{$lctseng_scripts[:permanently_variable]}"
 
@@ -143,9 +152,14 @@ module PermanentlyVariables
     data = nil
     begin
       data = load_data("Permanent.dat")
-      puts "已讀取存在的檔案"
+      if data.check_checksum
+        puts "已讀取存在的檔案"
+      else
+        puts "檔案遭到修改！"
+        raise RuntimeError, "檔案損壞！"
+      end
     rescue
-      puts "檔案不存在！創立新物件"
+      puts "檔案不存在或損壞！創立新物件"
       data = Game_PermanentlyVariables.new
     end
     return data
@@ -155,6 +169,7 @@ module PermanentlyVariables
   #--------------------------------------------------------------------------
   def self.sync_record
     puts "正在同步檔案"
+    $game_permanent.generate_checksum
     save_data($game_permanent, "Permanent.dat")
   end
 
@@ -183,6 +198,33 @@ class Game_PermanentlyVariables
   def clear
     @switchs = {}
     @variables = {}
+    @checksum = 0
+  end
+  #--------------------------------------------------------------------------
+  # ● 產生檢查碼
+  #--------------------------------------------------------------------------
+  def generate_checksum
+    @checksum = calculate_checksum
+  end
+  #--------------------------------------------------------------------------
+  # ● 計算檢查碼
+  #--------------------------------------------------------------------------
+  def calculate_checksum
+    checksum = 0
+    @switchs.each_pair do |id,val|
+      checksum += (id*Lctseng::PermanentlyVariables::PRIME_1 * (val ? -1 : 1))
+    end
+    @variables.each_pair do |id,val|
+      checksum += (id*Lctseng::PermanentlyVariables::PRIME_1 + val*Lctseng::PermanentlyVariables::PRIME_2)
+    end
+    puts "檢查碼：#{checksum}"
+    return checksum
+  end
+  #--------------------------------------------------------------------------
+  # ● 測試檢查碼
+  #--------------------------------------------------------------------------
+  def check_checksum
+    @checksum == calculate_checksum
   end
   #--------------------------------------------------------------------------
   # ● 取得開關
@@ -249,7 +291,7 @@ class Game_Switches
       puts "寫入普通開關：#{switch_id}：#{value}"
       lctseng_set(switch_id, value)
     end
-    
+
   end
 end
 
@@ -290,8 +332,6 @@ class Game_Variables
       puts "寫入普通變數：#{variable_id}：#{value}"
       lctseng_set(variable_id, value)
     end
-    
+
   end
 end
-
-
