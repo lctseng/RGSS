@@ -7,7 +7,7 @@
 
                        for RGSS3
 
-        Ver 1.00   2013.02.10
+        Ver 1.1.0   2015.12.22
 
    原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
    原文發表於：巴哈姆特RPG製作大師哈拉版
@@ -20,10 +20,14 @@
                        一、前景多一層視野屏障，可模擬洞窟視野
 
    更新紀錄：
-    Ver 1.00 ：
+    Ver 1.0.0 ：
     日期：2013.02.10
     摘要：一、最初版本
-    
+
+    Ver 1.1.0 ：
+    日期：2015.12.22
+    摘要：一、新增Z座標調整
+
 
 
     撰寫摘要：一、此腳本修改或重新定義以下類別：
@@ -31,42 +35,46 @@
                           2.Game_Picture
                           3.Game_Map
                           4.Scene_Map
-                          
+                          5.Sprite_Picture
+
                         二、可供修改的模組：
                           1.Lctseng_Dark_Sight_Settings
-                          
-                          
+
+
 
 *******************************************************************************************
 
 =end
 
 module Lctseng_Dark_Sight_Settings
-  
+
   # 屏障淡入時間
   DEFAULT_FADEIN_DURATION = 120
   # 屏障淡出時間
   DEFAULT_FADEOUT_DURATION = 120
-  
+
+  PICTURE_Z = 500
+
 end
 
 
 #*******************************************************************************************
 #
 #   請勿修改從這裡以下的程式碼，除非你知道你在做什麼！
-#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO ! 
+#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO !
 #
 #*******************************************************************************************
 
 #--------------------------------------------------------------------------
 # ★ 紀錄腳本資訊
 #--------------------------------------------------------------------------
-if !$lctseng_scripts  
+if !$lctseng_scripts
   $lctseng_scripts = {}
 end
-$lctseng_scripts[:dark_sight] = "1.00"
+_sym = :dark_sight
+$lctseng_scripts[_sym] = "1.1.0"
 
-puts "載入腳本：Lctseng - 前景視野屏障，版本：#{$lctseng_scripts[:dark_sight]}"
+puts "載入腳本：Lctseng - 前景視野屏障，版本：#{$lctseng_scripts[_sym]}"
 
 
 #==============================================================================
@@ -94,12 +102,12 @@ class Game_Interpreter
     $game_map.force_white_time = 60
     $game_map.dark_sight_fadein_speed = 255.0 / 300
   end
-  
-  
+
+
   def change_sight_picture(filename)
     $game_map.screen.pictures[0].show(filename ,  1 ,$game_player.screen_x,$game_player.screen_y, 100, 100, 0, 0)
   end
-  
+
 end##end class
 
 #encoding:utf-8
@@ -181,20 +189,20 @@ class Game_Map
          @dark_sight_fadeout_speed = 0.0
        end
     end
-   
+
   end
 end
 
 
  #$game_map.screen.pictures[0].move_xy(screen_x,screen_y ) rescue nil #if $game_map.screen.pictures[0]
- 
- 
+
+
  #==============================================================================
 # ■ Scene_Map
 #==============================================================================
 
 class Scene_Map < Scene_Base
-  
+
   #--------------------------------------------------------------------------
   # ● 開始處理
   #--------------------------------------------------------------------------
@@ -205,8 +213,32 @@ class Scene_Map < Scene_Base
     if $game_map.screen.pictures[0].name == ""
       $game_map.screen.pictures[0].show("Dark_Sight",  1 ,$game_player.screen_x,$game_player.screen_y, 100, 100, 0, 0)
     end
-    
+
   end
 end
 
 
+#encoding:utf-8
+#==============================================================================
+# ■ Sprite_Picture
+#------------------------------------------------------------------------------
+# 　顯示圖片用的精靈。根據 Game_Picture 類的實例的狀態自動變化。
+#==============================================================================
+
+class Sprite_Picture
+  #--------------------------------------------------------------------------
+  # ● 更新位置
+  #--------------------------------------------------------------------------
+  alias lctseng_dark_sight_update_position update_position
+  def update_position(*args,&block)
+    if @picture.number == 0
+      self.x = @picture.x
+      self.y = @picture.y
+      self.z = Lctseng_Dark_Sight_Settings::PICTURE_Z
+    else
+      lctseng_dark_sight_update_position(*args,&block)
+    end
+
+  end
+
+end
