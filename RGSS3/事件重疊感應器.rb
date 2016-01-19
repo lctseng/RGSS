@@ -7,12 +7,12 @@
 
                        for RGSS3
 
-        Ver 1.20   2014.04.14
+        Ver 1.3.0   2016.01.19
 
    原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
    原文發表於：巴哈姆特RPG製作大師哈拉版
    原為替替"charlotte051(夏洛特‧聖堂祭司)"撰寫的特製版本
-   
+
 
    轉載請保留此標籤
 
@@ -23,36 +23,45 @@
                        二、可自行設定感應器的觸發開關編號
 
    更新紀錄：
-    Ver 1.00 ：
+    Ver 1.0.0 ：
     日期：2014.04.13
     摘要：一、最初版本
-                二、功能：                  
+                二、功能：
                        一、當玩家與事件重疊時，開啟事件的獨立開關D
 
-    Ver 1.10 ：
+    Ver 1.1.0 ：
     日期：2014.04.13
     摘要：
-                一、追加功能：                  
+                一、追加功能：
                        一、可自行設定感應器的觸發開關編號
                        二、指定事件也可以觸發感應器
-                       
-                       
-    Ver 1.20 ：
+
+
+    Ver 1.2.0 ：
     日期：2014.04.14
     摘要：
-                一、追加功能：                  
+                一、追加功能：
                        一、可讓獨立開關不會自動關閉
-                       
-                       
+
+
+
+    Ver 1.3.0 ：
+    日期：2016.01.19
+    摘要：
+                一、追加功能：
+                       一、可用開關控制是否啟用此功能
+
+
+
 
     撰寫摘要：一、此腳本修改或重新定義以下類別：
                            1. Game_Event
-                           
-                           
+
+
                         二、此腳本提供可供設定的模組：
                           1.Lctseng::Overlap_Sensor
-                           
-                          
+
+
 
 *******************************************************************************************
 
@@ -66,6 +75,11 @@
 module Lctseng
 module Overlap_Sensor
   #--------------------------------------------------------------------------
+  # ● 啟用的開關，如果這個開關被打開，才會開始偵測
+  #      若設為0，則代表永遠開啟
+  #--------------------------------------------------------------------------
+  SENSOR_SWITCH_ENABLE_SWITCH_ID = 16
+  #--------------------------------------------------------------------------
   # ● 定義預設的自用開關編號
   #--------------------------------------------------------------------------
   # 玩家用
@@ -77,8 +91,8 @@ module Overlap_Sensor
   #       注意，如果事件內容太長，則自動關閉要設為false，避免事件被中斷執行
   #--------------------------------------------------------------------------
   SENSOR_SWITCH_AUTO_OFF = true
-  
-  
+
+
 end
 end
 
@@ -87,7 +101,7 @@ end
 #*******************************************************************************************
 #
 #   請勿修改從這裡以下的程式碼，除非你知道你在做什麼！
-#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO ! 
+#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO !
 #
 #******************************************************************************************
 
@@ -96,12 +110,13 @@ end
 #--------------------------------------------------------------------------
 # ★ 紀錄腳本資訊
 #--------------------------------------------------------------------------
-if !$lctseng_scripts  
+if !$lctseng_scripts
   $lctseng_scripts = {}
 end
-$lctseng_scripts[:overlap_sensor] = "1.20"
+_sym = :overlap_sensor
+$lctseng_scripts[_sym] = "1.3.0"
 
-puts "載入腳本：Lctseng - 事件重疊感應器，版本：#{$lctseng_scripts[:overlap_sensor]}"
+puts "載入腳本：Lctseng - 事件重疊感應器，版本：#{$lctseng_scripts[_sym]}"
 
 
 #encoding:utf-8
@@ -112,7 +127,7 @@ puts "載入腳本：Lctseng - 事件重疊感應器，版本：#{$lctseng_scrip
 #   在 Game_Map 類的內部使用。
 #==============================================================================
 
-class Game_Event < Game_Character 
+class Game_Event < Game_Character
   #--------------------------------------------------------------------------
   # ● 加入設定模組
   #--------------------------------------------------------------------------
@@ -172,7 +187,7 @@ class Game_Event < Game_Character
           if command.parameters[0] =~ /<Sensor_Player_Switch=(.*)>/
             @sensor_player_sw_label = $1
           end #end if
-          
+
         end #end if
       end #end for
     end
@@ -186,7 +201,7 @@ class Game_Event < Game_Character
   #--------------------------------------------------------------------------
   def update(*args,&block)
     lctseng_for_overlap_Update(*args,&block)
-    if @enable_sensor
+    if ( SENSOR_SWITCH_ENABLE_SWITCH_ID ==  0 || $game_switches[SENSOR_SWITCH_ENABLE_SWITCH_ID] )&& @enable_sensor
       check_sensor
     end
   end
@@ -196,7 +211,7 @@ class Game_Event < Game_Character
   def check_sensor
     sensor_player
     sensor_event
-  end  
+  end
   #--------------------------------------------------------------------------
   # ● 偵測指定事件
   #--------------------------------------------------------------------------
@@ -208,19 +223,18 @@ class Game_Event < Game_Character
       end
     end
     if SENSOR_SWITCH_AUTO_OFF && $game_self_switches[@sensor_event_key]
-      $game_self_switches[@sensor_event_key] = false 
+      $game_self_switches[@sensor_event_key] = false
     end
-    
+
   end
   #--------------------------------------------------------------------------
   # ● 偵測玩家
   #--------------------------------------------------------------------------
   def sensor_player
     if !SENSOR_SWITCH_AUTO_OFF && $game_self_switches[@sensor_player_key]
-      return 
+      return
     else
       $game_self_switches[@sensor_player_key] = self.pos?($game_player.x,$game_player.y)
     end
   end
 end
-
