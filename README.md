@@ -11,3 +11,5 @@ RGSS
   - 包含所有RMVA內建腳本、網路上插件腳本、自行撰寫的腳本
   - 不保證能另開專案運行，僅供參考內部各功能
   - 腳本匯出方式：使用Eric等人開發的Gemini工具
+- LICENSE: Apache License 2.0
+  - Copyright 2015-2016 Liang-Chi Tseng(lctseng)
