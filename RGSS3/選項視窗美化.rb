@@ -7,10 +7,10 @@
 
                        for RGSS3
 
-        Ver 1.00   2014.09.21
+        Ver 1.1.0   2016.02.17
 
    原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
-   
+
 
    轉載請保留此標籤
 
@@ -18,27 +18,31 @@
 
    主要功能：
                        一、美化內建的小小選項視窗，變成畫面左上方的大選項
-    
-                       
+
+
     注意事項：
         ■、若有使用腳本：Lctseng-合併欄位選項，則請將該腳本置於此腳本上方
 
    更新紀錄：
-    Ver 1.00 ：
+    Ver 1.0.0 ：
     日期：2014.09.21
     摘要：■、最初版本
 
-
+    Ver 1.1.0 ：
+    日期：2016.02.17
+    摘要：
+                ■、修正離開商店獲選單時黑框的情形
+                ■、隱藏選項視窗的箭頭
 
 
     撰寫摘要：一、此腳本修改或重新定義以下類別：
                            ■ Window_ChoiceList
-                          
+
                         二、此腳本提供設定模組
                            ■ Lctseng::LargeChoiceWindow
-                           
-                           
-                           
+
+
+
 *******************************************************************************************
 
 =end
@@ -74,7 +78,7 @@ module LargeChoiceWindow
   WINDOW_WIDTH = Graphics.width / 2
   # 高
   WINDOW_HEIGHT = Graphics.height - 200
-  
+
 end
 end
 
@@ -82,22 +86,27 @@ end
 #*******************************************************************************************
 #
 #   請勿修改從這裡以下的程式碼，除非你知道你在做什麼！
-#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO ! 
+#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO !
 #
 #*******************************************************************************************
 
 #--------------------------------------------------------------------------
 # ★ 紀錄腳本資訊
 #--------------------------------------------------------------------------
-if !$lctseng_scripts  
+if !$lctseng_scripts
   $lctseng_scripts = {}
 end
 
+# 避免舊資料遭覆蓋
+@_old_val_script_sym = @_script_sym if !@_script_sym.nil?
+@_script_sym = :large_choice_window
 
-$lctseng_scripts[:large_choice_window] = "1.00"
+$lctseng_scripts[@_script_sym] = "1.1.0"
 
-puts "載入腳本：Lctseng - 選項視窗美化，版本：#{$lctseng_scripts[:large_choice_window]}"
+puts "載入腳本：Lctseng - 選項視窗美化，版本：#{$lctseng_scripts[@_script_sym]}"
 
+# 還原舊資料
+@_script_sym = @_old_val_script_sym if !@_old_val_script_sym.nil?
 
 
 #encoding:utf-8
@@ -123,7 +132,10 @@ class Window_ChoiceList < Window_Command
     @select = Sprite.new(self.viewport)
     @select.bitmap = Bitmap.new(contents_width - 8,line_height)
     @select.bitmap.fill_rect(@select.bitmap.rect,Color.new(0,0,0,200))
+    @select.visible = false
+    @select.opacity = 0
     @select_flash_count = 90
+    self.arrows_visible = false
   end
   #--------------------------------------------------------------------------
   # ● 更新打開處理
@@ -150,7 +162,7 @@ class Window_ChoiceList < Window_Command
   #--------------------------------------------------------------------------
   def close?
     self.contents_opacity <= 0
-  end  
+  end
   #--------------------------------------------------------------------------
   # ● 更新窗口的位置 - 【修改定義】
   #--------------------------------------------------------------------------
@@ -193,7 +205,7 @@ class Window_ChoiceList < Window_Command
     remain = contents_height - line_height * row_max
     # 根據index分配數量
     assign = ((remain / row_max)*index).round
-    
+
     rect.y = (index / col_max * item_height) + assign
     rect
   end
@@ -234,7 +246,7 @@ class Window_ChoiceList < Window_Command
   def update
     super
     @select.visible = self.visible
-    @select.opacity = self.contents_opacity
+    @select.opacity = [self.contents_opacity,self.openness].min
     @select.x = self.x + self.cursor_rect.x + 16
     @select.y = self.y + self.cursor_rect.y + 12
     if @select_flash_count < 0
@@ -246,5 +258,5 @@ class Window_ChoiceList < Window_Command
     @select.update
   end
 
-  
+
 end
