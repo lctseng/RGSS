@@ -2,61 +2,56 @@
 
 =begin
 *******************************************************************************************
-
    ＊ 套用自製對話框 ＊
-
                        for RGSS3
-
-        Ver 1.01   2015.01.21
-
+        Ver 1.1.0   2016.05.21
    原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
-   
 
    轉載請保留此標籤
-
    個人小屋連結：http://home.gamer.com.tw/homeindex.php?owner=play123
-
    主要功能：
                        一、可套用另外繪製的對話框(for 544x416解析度)
-                       
-                       
-                       
+
+
+
    更新紀錄：
     Ver 0.1 ：
     日期：2014.10.03
     摘要：
           ■、最初版本
-    
-    
+
+
     Ver 0.2
     日期：2014.10.06
     摘要：
           ■、修正釋放精靈組時變數名稱錯誤的問題
-
     Ver 0.3
     日期：2014.10.10
     摘要：
           ■、加入自訂哪一個背景模式要顯示對話框的設定
-
-    Ver 1.00
+    Ver 1.0.0
     日期：2014.10.19
     摘要：
           ■、腳本整合發布
-          
-    Ver 1.01
+
+    Ver 1.0.1
     日期：2015.01.21
     摘要：
           ■、修正與\LF立繪腳本衝突的問題
-          
-          
+
+    Ver 1.1.0
+    日期：2016.05.21
+    摘要：
+          ■、不顯示自訂對話框
+
+
     撰寫摘要：一、此腳本修改或重新定義以下類別：
                            ■ Window_Message
-                           
+
                       二、設定模組：
                            ■ Lctseng::TalkFrame
-                           
-*******************************************************************************************
 
+*******************************************************************************************
 =end
 
 
@@ -75,26 +70,26 @@ module TalkFrame
   #            [0,1]  正常和暗化時有對話框(註：暗化時的黑背景效果仍在)
   #--------------------------------------------------------------------------
   SHOW_FRAME_BACKGROUND_MODE = [0]
-end  
+end
 end
 
 
 #*******************************************************************************************
 #
 #   請勿修改從這裡以下的程式碼，除非你知道你在做什麼！
-#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO ! 
+#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO !
 #
 #*******************************************************************************************
 
 #--------------------------------------------------------------------------
 # ★ 紀錄腳本資訊
 #--------------------------------------------------------------------------
-if !$lctseng_scripts  
+if !$lctseng_scripts
   $lctseng_scripts = {}
 end
 
 
-$lctseng_scripts[:custom_talk_frame] = "1.00"
+$lctseng_scripts[:custom_talk_frame] = "1.1.0"
 
 puts "載入腳本：Lctseng - 套用自製對話框，版本：#{$lctseng_scripts[:custom_talk_frame]}"
 
@@ -162,13 +157,17 @@ class Window_Message < Window_Base
     else
       @blank_frame_sprite.opacity = 0
     end
-    self.opacity = 0
+    if SHOW_FRAME_BACKGROUND_MODE.include?(@background)
+      self.opacity = 0
+    else
+      self.opacity = 255 if @background == 0
+    end
   end
   #--------------------------------------------------------------------------
   # ● 更新背景精靈 - 修改定義
   #--------------------------------------------------------------------------
   def update_back_sprite
-    if self.visible &&@background > 0  
+    if self.visible &&@background > 0
       @back_sprite.visible = (@background == 1)
       @back_sprite.y = y
       @back_sprite.opacity = openness
@@ -193,7 +192,7 @@ class Window_Message < Window_Base
     when 2
       @blank_frame_sprite.y = Graphics.height
     end
-    
+
   end
   #--------------------------------------------------------------------------
   # ● 更新窗口的位置 - 重新定義
@@ -203,4 +202,3 @@ class Window_Message < Window_Base
     update_background_sprite_placement
   end
 end
-
