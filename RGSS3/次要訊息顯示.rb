@@ -7,7 +7,7 @@
 #
 #                       for RGSS3
 #
-#        Ver 1.10   2014.10.22
+#        Ver 1.11   2016.6.30
 #
 #   原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
 #   原文發表於：巴哈姆特RPG製作大師哈拉版
@@ -31,12 +31,17 @@
 #    Ver 1.01 ：
 #    日期：2013.07.24
 #    摘要：一、新增功能：視窗位置可以自行調整
-
+#
 #    Ver 1.10 ：
 #    日期：2014.10.22
 #    摘要：一、新增功能：文字繪製支援特殊字元(例如繪製圖標：使用\\I[編號])
-
-
+#
+#
+#    Ver 1.11 ：
+#    日期：2016.6.30
+#    摘要：一、修正與ARPG傷害數字同時存在會噴錯的BUG
+#
+#
 #
 #    撰寫摘要：一、此腳本修改或重新定義以下類別：
 #                          1.Game_Interpreter
@@ -75,13 +80,13 @@ module SubMessage
     case index
     when 1 # 一號訊息列
       x = 0
-      y = line_height * index 
+      y = line_height * index
     when 2 # 二號訊息列
       x = 0
       y = line_height * index
     when 3 # 三號訊息列
       x = 0
-      y = line_height * index 
+      y = line_height * index
     when 4 # 四號訊息列
       x = 0
       y = line_height * index
@@ -103,14 +108,14 @@ module SubMessage
   def self.standard_padding
     return 12
   end
-  
+
 end
 end
 
 #*******************************************************************************************
 #
 #   請勿修改從這裡以下的程式碼，除非你知道你在做什麼！
-#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO ! 
+#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO !
 #
 #*******************************************************************************************
 #=======================================
@@ -122,7 +127,7 @@ $Lctseng_Enable_SubMessage = true
 #--------------------------------------------------------------------------
 # ★ 紀錄腳本資訊
 #--------------------------------------------------------------------------
-if !$lctseng_scripts  
+if !$lctseng_scripts
   $lctseng_scripts = {}
 end
 __script_sym = :sub_message
@@ -143,8 +148,8 @@ module Lctseng_Sub_Message_Store_Settings
   def sub_msg_object
     $game_system.sub_msg_object
   end
-  
-  
+
+
 end
 
 
@@ -165,7 +170,7 @@ class Game_SubMessageCollecter
   # ● 類方法 - 啟動全動態化
   #--------------------------------------------------------------------------
   def self.enable_all_dynamic
-    @@all_dynamic = true 
+    @@all_dynamic = true
   end
   #--------------------------------------------------------------------------
   # ● 類方法 - 關閉全動態化
@@ -177,7 +182,7 @@ class Game_SubMessageCollecter
   # ● 類方法 - 啟動半動態化
   #--------------------------------------------------------------------------
   def self.enable_half_dynamic
-    @@half_dynamic = true 
+    @@half_dynamic = true
   end
   #--------------------------------------------------------------------------
   # ● 類方法 - 關閉半動態化
@@ -281,7 +286,7 @@ class Game_SubMessageCollecter
     end
     return ''
   end
-  
+
 end
 
 
@@ -326,9 +331,8 @@ class Game_System
   #--------------------------------------------------------------------------
   # ★ 方法重新定義
   #--------------------------------------------------------------------------
-  unless @lctseng_for_drop_item_window_alias
-    alias lctseng_for_drop_item_window_Initialize initialize # 初始化對象
-    @lctseng_for_drop_item_window_alias = true
+  unless $@
+    alias lctseng_for_sub_message_Initialize initialize # 初始化對象
   end
   #--------------------------------------------------------------------------
   # ● 定義實例變量
@@ -339,7 +343,7 @@ class Game_System
   # ● 初始化對象
   #--------------------------------------------------------------------------
   def initialize
-    lctseng_for_drop_item_window_Initialize
+    lctseng_for_sub_message_Initialize
     # 次要訊息用
     @sub_msg_object = Game_SubMessageCollecter.new
   end
@@ -381,7 +385,7 @@ class Window_SubMessage < Window_Base
   #--------------------------------------------------------------------------
   def update
     super
-    if @show_count > 0 
+    if @show_count > 0
       update_fadein
       @show_count -= 1
     else
@@ -467,11 +471,10 @@ class Scene_Map < Scene_Base
   #--------------------------------------------------------------------------
   # ● 方法重新定義別名
   #--------------------------------------------------------------------------
-  unless @lctsneg_for_arpg_alias
+  unless $@
     alias lctseng_start start # 開始處理
-    alias lctseng_for_arpg_Update_basic update_basic # 更新畫面（基礎）
-    alias lctseng_for_arpg_Create_all_windows create_all_windows # 生成所有窗口
-    @lctsneg_for_arpg_alias = true
+    alias lctseng_for_sub_message_Update_basic update_basic # 更新畫面（基礎）
+    alias lctseng_for_sub_message_Create_all_windows create_all_windows # 生成所有窗口
   end
   #--------------------------------------------------------------------------
   # ● 開始處理  - 重新定義
@@ -484,8 +487,8 @@ class Scene_Map < Scene_Base
   # ● 更新畫面（基礎） - 重新定義
   #--------------------------------------------------------------------------
   def update_basic
-    lctseng_for_arpg_Update_basic
-    update_sub_msg 
+    lctseng_for_sub_message_Update_basic
+    update_sub_msg
   end
   #--------------------------------------------------------------------------
   # ● 更新即時訊息收集物件
@@ -497,7 +500,7 @@ class Scene_Map < Scene_Base
   # ● 生成所有窗口-  重新定義
   #--------------------------------------------------------------------------
   def create_all_windows
-    lctseng_for_arpg_Create_all_windows
+    lctseng_for_sub_message_Create_all_windows
     create_item_name_window
   end
   #--------------------------------------------------------------------------
@@ -510,9 +513,5 @@ class Scene_Map < Scene_Base
     @item_name_window4 = Window_SubMessage.new(4)
     @item_name_window5 = Window_SubMessage.new(5)
   end
-  
+
 end ##end class
-
-
-
-
