@@ -15,7 +15,7 @@
    轉載請保留此標籤
 
    個人小屋連結：http://home.gamer.com.tw/homeindex.php?owner=play123
-
+   更多腳本請至Github：https://github.com/lctseng/RGSS
 
    主要功能：
                        一、於遊戲中更改遊戲標題，於下次遊戲時生效
