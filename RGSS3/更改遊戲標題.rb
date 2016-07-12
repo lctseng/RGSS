@@ -15,12 +15,16 @@
    轉載請保留此標籤
 
    個人小屋連結：http://home.gamer.com.tw/homeindex.php?owner=play123
-   完整腳本程式碼：https://github.com/lctseng/RGSS
 
 
    主要功能：
                        一、於遊戲中更改遊戲標題，於下次遊戲時生效
                        二、變更是永久性的，不同遊戲間會共用修改後的標題
+
+   使用方法：
+                       一、想要更改標題時，直接用腳本呼叫
+                                      Lctseng.set_game_title("新的標題")
+                                即可
 
    更新紀錄：
     Ver 1.0.0 ：
