@@ -7,7 +7,7 @@
 
                        for RGSS3
 
-        Ver 1.1.0   2015.07.26
+        Ver 1.1.0   2016.07.23
 
    原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
    原文發表於：巴哈姆特RPG製作大師哈拉版
@@ -42,10 +42,10 @@
     日期：2014.11.14
     摘要：一、整合腳本
 
-    更新紀錄：
-     Ver 1.1.0 ：
-     日期：2015.07.26
-     摘要：一、修改預設字形
+   更新紀錄：
+    Ver 1.1.0 ：
+    日期：2016.07.23
+    摘要：一、新增自訂多種字型的功能
 
     撰寫摘要：一、此腳本修改或重新定義以下類別：
                           1.Game_Interpreter
@@ -70,15 +70,33 @@ module Lctseng_Event_Name_Setting_For_Normal_Version
   #--------------------------------------------------------------------------
   # ● 字型設定
   #--------------------------------------------------------------------------
-  Draw_Font = Font.new
-  Draw_Font.name = 'Microsoft JhengHei' #字體名稱
-  Draw_Font.size = 16 #字體大小
-  Draw_Font.color = (Color.new(254,255,132,255)) #字體內容顏色(RGB，紅色、綠色、藍色、不透明度)
-  Draw_Font.bold = true #是否粗體字
-  Draw_Font.italic = false #是否斜體字
-  Draw_Font.outline = true #是否繪製文字邊緣
-  Draw_Font.shadow = true #是否繪製陰影
-  Draw_Font.out_color = (Color.new(100,100,100,255)) #文字邊緣顏色(RGB，紅色、綠色、藍色、不透明度)
+  Draw_Fonts = {}
+
+  # 編號0：預設字型
+  _new_font = Font.new
+  _new_font.name = 'Microsoft JhengHei' #字體名稱
+  _new_font.size = 16 #字體大小
+  _new_font.color = (Color.new(254,255,132,255)) #字體內容顏色(RGB，紅色、綠色、藍色、不透明度)
+  _new_font.bold = true #是否粗體字
+  _new_font.italic = false #是否斜體字
+  _new_font.outline = true #是否繪製文字邊緣
+  _new_font.shadow = true #是否繪製陰影
+  _new_font.out_color = (Color.new(100,100,100,255)) #文字邊緣顏色(RGB，紅色、綠色、藍色、不透明度)
+  Draw_Fonts[0] = _new_font
+
+  # 編號1：自訂字型#1
+  _new_font = Font.new
+  _new_font.name = 'Microsoft JhengHei' #字體名稱
+  _new_font.size = 16 #字體大小
+  _new_font.color = (Color.new(255,128,128,255)) #字體內容顏色(RGB，紅色、綠色、藍色、不透明度)
+  _new_font.bold = true #是否粗體字
+  _new_font.italic = false #是否斜體字
+  _new_font.outline = true #是否繪製文字邊緣
+  _new_font.shadow = true #是否繪製陰影
+  _new_font.out_color = (Color.new(100,100,100,255)) #文字邊緣顏色(RGB，紅色、綠色、藍色、不透明度)
+  Draw_Fonts[1] = _new_font
+
+
   #--------------------------------------------------------------------------
   # ● 位置調整
   #--------------------------------------------------------------------------
@@ -103,9 +121,10 @@ end
 if !$lctseng_scripts
   $lctseng_scripts = {}
 end
-$lctseng_scripts[:event_name] = "1.1.0"
+_sym = :event_name
+$lctseng_scripts[_sym] = "1.1.0"
 
-puts "載入腳本：Lctseng - 顯示事件名稱，版本：#{$lctseng_scripts[:event_name]}"
+puts "載入腳本：Lctseng - 顯示事件名稱，版本：#{$lctseng_scripts[_sym]}"
 
 
 
@@ -170,6 +189,7 @@ class Game_Event < Game_Character
   #--------------------------------------------------------------------------
   def init_public_members
     lctseng_for_event_name_Init_public_members
+    @event_name_font_id = 0
     @current_ok_name = ""
     @need_redraw_name  = false
   end
@@ -202,6 +222,12 @@ class Game_Event < Game_Character
     @current_ok_name
   end
   #--------------------------------------------------------------------------
+  # ● 取得事件名稱字型ID
+  #--------------------------------------------------------------------------
+  def event_name_font_id
+    @event_name_font_id || 0
+  end
+  #--------------------------------------------------------------------------
   # ● 偵測事件是否有任何一頁有要求名稱
   #--------------------------------------------------------------------------
   def detect_all_need_names
@@ -225,21 +251,28 @@ class Game_Event < Game_Character
   #--------------------------------------------------------------------------
   def excute_if_need_name_in_the_comment_and_set_show_name
     @activate_event_name = false
+    @event_name_font_id = 0
     begin
       now_list = @page.list
     rescue
       return ''
     end
+    name = ''
     for command in now_list
       if command.code == 108
         ## 匹配出名稱
-        if command.parameters[0] =~ /<Show_Event_Name =(.*)>/
+        if command.parameters[0] =~ /<Show_Event_Name\s*=(.*)>/
           @activate_event_name = true
-          return $1
+          name =  $1
+        end #end if
+
+        ## 匹配出字型ID
+        if command.parameters[0] =~ /<Event_Name_Font_ID=(\d+)>/
+          @event_name_font_id =  $1.to_i
         end #end if
       end #end if
     end #end for
-    return ''
+    return name
   end #end def
 
 
@@ -329,6 +362,7 @@ class Sprite_EventName < Sprite
     self.visible = false
     @redrawing = false
     @event = event
+    @font_id = @event.event_name_font_id
     @current_name= @event.if_need_name_in_the_comment_and_get_show_name
     create_bitmap
     redraw
@@ -344,12 +378,13 @@ class Sprite_EventName < Sprite
   # ● 生成位圖
   #--------------------------------------------------------------------------
   def create_bitmap
-    width = @current_name.size * Lctseng_Event_Name_Setting_For_Normal_Version::Draw_Font.size * 2
+    font = Lctseng_Event_Name_Setting_For_Normal_Version::Draw_Fonts[@font_id]
+    width = @current_name.size * font.size * 2
     if width <=0
       width = 1
     end
-    self.bitmap = Bitmap.new(width, Lctseng_Event_Name_Setting_For_Normal_Version::Draw_Font.size)
-    self.bitmap.font = Lctseng_Event_Name_Setting_For_Normal_Version::Draw_Font
+    self.bitmap = Bitmap.new(width, font.size)
+    self.bitmap.font = font
   end
   #--------------------------------------------------------------------------
   # ● 更新畫面
@@ -368,6 +403,7 @@ class Sprite_EventName < Sprite
       @event.need_redraw_name = false
       new_name = @event.if_need_name_in_the_comment_and_get_show_name
       if @current_name != new_name
+        @font_id = @event.event_name_font_id
         @current_name = new_name
         redraw
       end
