@@ -7,10 +7,10 @@
 
                        for RGSS3
 
-        Ver 1.11   2014.11.05
+        Ver 1.2   2016.08.29
 
    原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
-   
+
 
    轉載請保留此標籤
 
@@ -18,33 +18,37 @@
 
    需求前置腳本：Lctseng - 圖像精靈強化
    請將此腳本至於該腳本底下
-   
+
    主要功能：
                        一、顯示左右邊的立繪，與對話框分開(即沒有關聯)
-                       
+
 
    更新紀錄：
     Ver 1.00 ：
     日期：2014.09.24
     摘要：■、最初版本
-    
-    
+
+
     Ver 1.10 ：
     日期：2014.10.30
     摘要：■、加入調整透明度的功能
-    
-    
+
+
     Ver 1.11 ：
     日期：2014.11.05
     摘要：■、修正立即出現沒有調整透明度的錯誤
-    
+
+    Ver 1.2 ：
+    日期：2016.08.29
+    摘要：■、移除對話框行數多一行的部分
+
+
     撰寫摘要：一、此腳本修改或重新定義以下類別：
                            ■ Game_Interpreter
                            ■ Game_System
-                           ■ Window_Message
                            ■ Scene_Base
                            ■ Scene_Map
-                          
+
                         二、此腳本新定義以下類別和模組：
                            ■ Lctseng::Game_StandController
                            ■ Lctseng::Game_Stand
@@ -54,7 +58,7 @@
                            ■ Lctseng::Sprite_Stand
                            ■ Lctseng::Sprite_LeftStand
                            ■ Lctseng::Sprite_RightStand
-                          
+
 
 *******************************************************************************************
 =end
@@ -63,14 +67,14 @@
 #*******************************************************************************************
 #
 #   請勿修改從這裡以下的程式碼，除非你知道你在做什麼！
-#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO ! 
+#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO !
 #
 #*******************************************************************************************
 
 #--------------------------------------------------------------------------
 # ★ 紀錄腳本資訊
 #--------------------------------------------------------------------------
-if !$lctseng_scripts  
+if !$lctseng_scripts
   $lctseng_scripts = {}
 end
 
@@ -114,7 +118,7 @@ class Game_Interpreter
   def left_change(*args)
     $game_system.stand.left_change(*args)
   end
-  
+
   #--------------------------------------------------------------------------
   # ● 右圖片飛入
   #--------------------------------------------------------------------------
@@ -183,7 +187,7 @@ class Game_Interpreter
   end
 
 end
-  
+
 
 #encoding:utf-8
 #==============================================================================
@@ -199,40 +203,6 @@ class Game_System
   #--------------------------------------------------------------------------
   def stand
     @stand ||= Lctseng::Game_StandController.new
-  end
-end
-
-
-#encoding:utf-8
-#==============================================================================
-# ■ Window_Message
-#------------------------------------------------------------------------------
-# 　顯示文字信息的窗口。
-#==============================================================================
-
-class Window_Message < Window_Base
-  #--------------------------------------------------------------------------
-  # ● 獲取窗口的高度
-  #--------------------------------------------------------------------------
-  def window_height
-    fitting_height(visible_line_number + 1)
-  end
-  #--------------------------------------------------------------------------
-  # ● 換行文字的處理 【修改定義】
-  #--------------------------------------------------------------------------
-  def process_new_line(text, pos)
-    @line_show_fast = false
-    pos[:x] = pos[:new_x]
-    pos[:y] += pos[:height]
-    if !@first_line_process
-      @first_line_process = true
-      pos[:y] += 10
-    end
-    pos[:height] = calc_line_height(text)
-    if need_new_page?(text, pos)
-      input_pause
-      new_page(text, pos)
-    end
   end
 end
 
@@ -347,14 +317,14 @@ class Game_Stand
     # :none 無
     # :slide_in_req 要求飛入
     # :sliding_in   飛入中
-    # slide_out_req  要求飛出 
+    # slide_out_req  要求飛出
     # :sliding_out  飛出中
     # :show 顯示中
     # :change_req 要求更換
     # :changing 更換中
     @status = :none
     # 更換時的新檔名【僅show中更換時生效】
-    @new_filename = '' 
+    @new_filename = ''
     # 更換時的舊檔名【僅show中更換時生效】
     @old_filename = ''
     # 更換時是否快速更換，代表立即顯示不淡入
@@ -420,7 +390,7 @@ class Game_Stand
   # ● 要求飛入
   #--------------------------------------------------------------------------
   def slide_in_req
-    @status = :slide_in_req 
+    @status = :slide_in_req
   end
   #--------------------------------------------------------------------------
   # ● 要求飛出
@@ -434,7 +404,7 @@ class Game_Stand
   def limit_opacity(value)
     @opacity_limit = value
   end
-  
+
 end
 end
 
@@ -849,7 +819,7 @@ class Sprite_LeftStand < Sprite_Stand
     pos[0] = -0.5 * self.width # x座標為負的一半寬度
     pos
   end
-  
+
 end
 end
 
@@ -881,7 +851,7 @@ class Sprite_RightStand < Sprite_Stand
   #--------------------------------------------------------------------------
   def slided_in_pos
     pos = super
-    pos[0] = Graphics.width - self.width 
+    pos[0] = Graphics.width - self.width
     slide_in_pos_adjust(pos)
   end
   #--------------------------------------------------------------------------
@@ -1016,9 +986,3 @@ class Scene_Map < Scene_Base
     lctseng_stand_pre_transfer
   end
 end
-
-
-
-
-
-  
