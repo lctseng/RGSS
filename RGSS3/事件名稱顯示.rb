@@ -7,7 +7,7 @@
 
                        for RGSS3
 
-        Ver 1.1.0   2016.07.23
+        Ver 1.1.1   2017.03.10
 
    原作者：魂(Lctseng)，巴哈姆特論壇ID：play123
    原文發表於：巴哈姆特RPG製作大師哈拉版
@@ -23,57 +23,59 @@
     Ver 0.1 ：
     日期：2013.01.17
     摘要：一、最初版本
-
-
+    
    更新紀錄：
     Ver 0.2 ：
     日期：2013.01.17
     摘要：一、修正更換地圖時舊名稱ID無法即時刷新的問題(感謝巴友 aries0411 發現此問題)
-
 
    更新紀錄：
     Ver 0.3 ：
     日期：2013.01.23
     摘要：一、修正一開始的事件頁沒有名稱時以後無法產生名稱圖像的錯誤
 
-
    更新紀錄：
     Ver 1.0.0 ：
     日期：2014.11.14
     摘要：一、整合腳本
-
+    
    更新紀錄：
     Ver 1.1.0 ：
     日期：2016.07.23
     摘要：一、新增自訂多種字型的功能
-
+    
+   更新紀錄：
+    Ver 1.1.1 ：
+    日期：2017.03.10
+    摘要：一、修正同文字但不同字型不會刷新的錯誤
+    
     撰寫摘要：一、此腳本修改或重新定義以下類別：
                           1.Game_Interpreter
                           2.Game_System
                           3.Game_Event
                           4.Spriteset_Map
-
+                          
                         二、新增的類別：
                           1.Sprite_EventName
-
+                          
                         三、可供修改的模組
                           1.設定字形與位置：Lctseng_Event_Name_Setting_For_Normal_Version
-
-
+                          
+                          
 
 *******************************************************************************************
 
 =end
 
 module Lctseng_Event_Name_Setting_For_Normal_Version
-
+  
   #--------------------------------------------------------------------------
   # ● 字型設定
   #--------------------------------------------------------------------------
   Draw_Fonts = {}
 
   # 編號0：預設字型
-  _new_font = Font.new
+  _new_font = Font.new 
   _new_font.name = 'Microsoft JhengHei' #字體名稱
   _new_font.size = 16 #字體大小
   _new_font.color = (Color.new(254,255,132,255)) #字體內容顏色(RGB，紅色、綠色、藍色、不透明度)
@@ -83,9 +85,9 @@ module Lctseng_Event_Name_Setting_For_Normal_Version
   _new_font.shadow = true #是否繪製陰影
   _new_font.out_color = (Color.new(100,100,100,255)) #文字邊緣顏色(RGB，紅色、綠色、藍色、不透明度)
   Draw_Fonts[0] = _new_font
-
+  
   # 編號1：自訂字型#1
-  _new_font = Font.new
+  _new_font = Font.new 
   _new_font.name = 'Microsoft JhengHei' #字體名稱
   _new_font.size = 16 #字體大小
   _new_font.color = (Color.new(255,128,128,255)) #字體內容顏色(RGB，紅色、綠色、藍色、不透明度)
@@ -95,30 +97,30 @@ module Lctseng_Event_Name_Setting_For_Normal_Version
   _new_font.shadow = true #是否繪製陰影
   _new_font.out_color = (Color.new(100,100,100,255)) #文字邊緣顏色(RGB，紅色、綠色、藍色、不透明度)
   Draw_Fonts[1] = _new_font
-
-
+  
+  
   #--------------------------------------------------------------------------
   # ● 位置調整
   #--------------------------------------------------------------------------
   Show_X_Adjust = 0 #顯示框的X座標調整
   Show_Y_Adjust = 0 #顯示框的Y座標調整
   Show_Z_Adjust = 0 #顯示框的Z座標調整
-
-
+  
+  
 end
 
 
 #*******************************************************************************************
 #
 #   請勿修改從這裡以下的程式碼，除非你知道你在做什麼！
-#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO !
+#   DO NOT MODIFY UNLESS YOU KNOW WHAT TO DO ! 
 #
 #*******************************************************************************************
 
 #--------------------------------------------------------------------------
 # ★ 紀錄腳本資訊
 #--------------------------------------------------------------------------
-if !$lctseng_scripts
+if !$lctseng_scripts  
   $lctseng_scripts = {}
 end
 _sym = :event_name
@@ -145,7 +147,7 @@ class Game_Interpreter
   def show_all_event_names
     $game_system.force_hide_all_event_name = false
   end
-
+  
 end##end class
 
 #encoding:utf-8
@@ -180,7 +182,7 @@ end
 #   在 Game_Map 類的內部使用。
 #==============================================================================
 
-class Game_Event < Game_Character
+class Game_Event < Game_Character    
   attr_accessor :need_redraw_name
   #--------------------------------------------------------------------------
   # ● 初始化公有成員變量 - 重新定義
@@ -265,7 +267,7 @@ class Game_Event < Game_Character
           @activate_event_name = true
           name =  $1
         end #end if
-
+        
         ## 匹配出字型ID
         if command.parameters[0] =~ /<Event_Name_Font_ID=(\d+)>/
           @event_name_font_id =  $1.to_i
@@ -274,8 +276,8 @@ class Game_Event < Game_Character
     end #end for
     return name
   end #end def
-
-
+  
+  
 end
 
 #encoding:utf-8
@@ -314,7 +316,7 @@ class Spriteset_Map
   def refresh_event_name
     dispose_event_name_sprites
     create_event_name_sprites
-  end
+  end  
   #--------------------------------------------------------------------------
   # ● 釋放
   #--------------------------------------------------------------------------
@@ -402,7 +404,7 @@ class Sprite_EventName < Sprite
     if @event.need_redraw_name
       @event.need_redraw_name = false
       new_name = @event.if_need_name_in_the_comment_and_get_show_name
-      if @current_name != new_name
+      if @current_name != new_name || @font_id != @event.event_name_font_id
         @font_id = @event.event_name_font_id
         @current_name = new_name
         redraw
