@@ -2,6 +2,7 @@
 =====
 - 巴哈姆特論壇自製遊戲公會計畫
 - 於2014下半年開始的遊戲企劃
+  - [遊戲介紹文章](https://home.gamer.com.tw/creationDetail.php?sn=2666134) 
 - 遊戲類型：AVG + 回合式卡牌戰鬥
 - [遊戲主程式下載](https://drive.google.com/file/d/0B6KmSTnbOf-CNG03TzdXamJ6M28/view?usp=sharing)
 - 此目錄包含
